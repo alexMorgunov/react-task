@@ -9,7 +9,6 @@ class Edit extends Component {
         const { hover, checked, color1, color2 } = this.props;
 
         const fill = checked || hover ? color1 : color2;
-
         return (
             <g>
                 <path
