@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { v4 } from 'uuid';
+import FlipMove from 'react-flip-move';
 
 import Checkbox from '../../theme/assets/Checkbox';
 import { BaseTaskModel } from '../../instruments';
@@ -37,18 +38,14 @@ export default class Scheduler extends Component {
         this.setState({
             tasksFilter: e.target.value,
         });
-        // const tasks = Object.assign([], this.state.tasks);
-        // const filteredTasks = tasks.filter((el) => {
-        //     if (e.target.value === '') {
-        //         return el.isNeedToDisplay = true;
-        //     }
-        //     if (el.message.indexOf(e.target.value) != -1) {
-        //         return el.isNeedToDisplay = false;
-        //     } else {
-        //         return el.isNeedToDisplay = true;
-        //     }
-        // });
-        // this.setState({tasks: filteredTasks});
+        if (e.target.value == '') return;
+        const tasks = [...this.state.tasks];
+        const filteredTasks = tasks.filter((el) => {
+            if (el.message.indexOf(e.target.value) != -1) {
+                return el;
+            }
+        });
+        this.setState({ filteredTasks });
     };
     _addNewTask = (e) => {
         e.preventDefault();
@@ -90,16 +87,32 @@ export default class Scheduler extends Component {
     // }
     render () {
         const tasks = this.state.tasks;
-        const tasksList = tasks.map((item, index) => {
-            return (<Task
-                _updateTask = { this._updateTaskMessageOnKeyDown.bind(this, item.id)}
-                completed = { item.completed }
-                favorite = { item.favorite }
-                id = { item.id }
-                key = { item.id }
-                message = { item.message }
-            />);
-        })
+        const filteredTasks = this.state.filteredTasks;
+        let tasksList;
+        if ( this.state.tasksFilter != '') {
+            tasksList = filteredTasks.map((item, index) => {
+                return (<Task
+                    _updateTask = { this._updateTaskMessageOnKeyDown.bind(this, item.id)}
+                    completed = { item.completed }
+                    favorite = { item.favorite }
+                    id = { item.id }
+                    key = { item.id }
+                    message = { item.message }
+                />);
+            });
+        } else {
+            tasksList = tasks.map((item, index) => {
+                return (<Task
+                    _updateTask = { this._updateTaskMessageOnKeyDown.bind(this, item.id)}
+                    completed = { item.completed }
+                    favorite = { item.favorite }
+                    id = { item.id }
+                    key = { item.id }
+                    message = { item.message }
+                />);
+            });
+        }
+
         return (
             <section className = { Styles.scheduler }>
                 <main>
@@ -114,7 +127,9 @@ export default class Scheduler extends Component {
                         </form>
                         <div>
                             <ul>
-                                { tasksList }
+                                <FlipMove>
+                                    { tasksList }
+                                </FlipMove>
                             </ul>
                         </div>
                     </section>
